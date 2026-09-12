@@ -1,0 +1,150 @@
+name: Build Desktop Agent (Windows & macOS)
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - release
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: "Build Agent (Windows)"
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (v24)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync Version from Git Tag / Release
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            echo "Setting new release version: $VERSION"
+            
+            npm --prefix agent version $VERSION --no-git-tag-version --allow-same-version
+            
+            node -e "
+              const fs = require('fs');
+              const confPath = 'agent/src-tauri/tauri.conf.json';
+              const conf = JSON.parse(fs.readFileSync(confPath, 'utf8'));
+              conf.version = '$VERSION';
+              fs.writeFileSync(confPath, JSON.stringify(conf, null, 2));
+            "
+
+            node -e "
+              const fs = require('fs');
+              const cargoPath = 'agent/src-tauri/Cargo.toml';
+              let cargo = fs.readFileSync(cargoPath, 'utf8');
+              cargo = cargo.replace(/^version = \".*\"/m, 'version = \"' + '$VERSION' + '\"');
+              fs.writeFileSync(cargoPath, cargo);
+            "
+          fi
+
+      - name: Install Monorepo Dependencies
+        run: npm install
+
+      - name: Build Tauri Desktop Installer (Windows)
+        run: |
+          cd agent
+          npm run tauri:build
+
+      - name: Upload Windows Installer (.exe & .msi)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-Windows-Installer
+          path: |
+            agent/src-tauri/target/release/bundle/nsis/*.exe
+            agent/src-tauri/target/release/bundle/msi/*.msi
+
+      - name: Attach Windows Installers to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            agent/src-tauri/target/release/bundle/nsis/*.exe
+            agent/src-tauri/target/release/bundle/msi/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    name: "Build Agent (macOS)"
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (v24)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync Version from Git Tag / Release
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            echo "Setting new release version: $VERSION"
+            
+            npm --prefix agent version $VERSION --no-git-tag-version --allow-same-version
+            
+            node -e "
+              const fs = require('fs');
+              const confPath = 'agent/src-tauri/tauri.conf.json';
+              const conf = JSON.parse(fs.readFileSync(confPath, 'utf8'));
+              conf.version = '$VERSION';
+              fs.writeFileSync(confPath, JSON.stringify(conf, null, 2));
+            "
+
+            node -e "
+              const fs = require('fs');
+              const cargoPath = 'agent/src-tauri/Cargo.toml';
+              let cargo = fs.readFileSync(cargoPath, 'utf8');
+              cargo = cargo.replace(/^version = \".*\"/m, 'version = \"' + '$VERSION' + '\"');
+              fs.writeFileSync(cargoPath, cargo);
+            "
+          fi
+
+      - name: Install Monorepo Dependencies
+        run: npm install
+
+      - name: Build Tauri Desktop Installer (macOS)
+        run: |
+          cd agent
+          npm run tauri:build
+
+      - name: Upload macOS Installer (.dmg)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Agent-macOS-Installer
+          path: |
+            agent/src-tauri/target/release/bundle/dmg/*.dmg
+
+      - name: Attach macOS Installer to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            agent/src-tauri/target/release/bundle/dmg/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

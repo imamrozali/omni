@@ -1,0 +1,2 @@
+// Console features module
+export {};

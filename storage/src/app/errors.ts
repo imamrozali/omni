@@ -1,0 +1,68 @@
+export class AppError extends Error {
+  public readonly statusCode: number;
+  public readonly code: string;
+
+  constructor(message: string, statusCode: number = 500, code: string = 'INTERNAL_SERVER_ERROR') {
+    super(message);
+    this.name = this.constructor.name;
+    this.statusCode = statusCode;
+    this.code = code;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+export class ValidationError extends AppError {
+  constructor(message: string = 'Validation failed') {
+    super(message, 400, 'VALIDATION_ERROR');
+  }
+}
+
+export class AuthenticationError extends AppError {
+  constructor(message: string = 'Authentication failed') {
+    super(message, 401, 'UNAUTHENTICATED');
+  }
+}
+
+export class AuthorizationError extends AppError {
+  constructor(message: string = 'Forbidden access') {
+    super(message, 403, 'FORBIDDEN');
+  }
+}
+
+export class NotFoundError extends AppError {
+  constructor(message: string = 'File not found') {
+    super(message, 404, 'FILE_NOT_FOUND');
+  }
+}
+
+export class SecurityError extends AppError {
+  constructor(message: string = 'Security violation detected') {
+    super(message, 403, 'SECURITY_VIOLATION');
+  }
+}
+
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+  };
+}
+
+export function formatSuccessResponse<T>(data: T): ApiResponse<T> {
+  return {
+    success: true,
+    data,
+  };
+}
+
+export function formatErrorResponse(code: string, message: string): ApiResponse<never> {
+  return {
+    success: false,
+    error: {
+      code,
+      message,
+    },
+  };
+}

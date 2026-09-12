@@ -1,0 +1,2 @@
+// Console constants module
+export {};

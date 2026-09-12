@@ -1,0 +1,2 @@
+// Console hooks module
+export {};

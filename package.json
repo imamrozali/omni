@@ -1,0 +1,31 @@
+{
+  "name": "omni-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Omni platform - Modular, scalable, and high-performance software platform",
+  "workspaces": [
+    "agent",
+    "console",
+    "server",
+    "storage"
+  ],
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=10 <11"
+  },
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:storage": "npm run dev --workspace=storage",
+    "dev:console": "npm run dev --workspace=console",
+    "dev:agent": "npm run dev --workspace=agent",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  }
+}

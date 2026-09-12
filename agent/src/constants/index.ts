@@ -1,0 +1,2 @@
+// Agent constants module
+export {};

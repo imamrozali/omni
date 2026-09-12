@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161b22"/>
+      <stop offset="100%" stop-color="#090d13"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#58a6ff"/>
+      <stop offset="50%" stop-color="#388bfd"/>
+      <stop offset="100%" stop-color="#1f6feb"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3fb950"/>
+      <stop offset="100%" stop-color="#238636"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="32" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="url(#bg)" stroke="#30363d" stroke-width="16" filter="url(#shadow)"/>
+
+  <!-- Outer Ring Accent -->
+  <circle cx="512" cy="512" r="320" fill="none" stroke="#21262d" stroke-width="24"/>
+  <circle cx="512" cy="512" r="320" fill="none" stroke="url(#glow)" stroke-width="24" stroke-dasharray="360 180" stroke-linecap="round"/>
+
+  <!-- Inner Node Hexagon / Core -->
+  <circle cx="512" cy="512" r="160" fill="url(#glow)" fill-opacity="0.15" stroke="url(#glow)" stroke-width="20"/>
+  
+  <!-- Central Pulse -->
+  <circle cx="512" cy="512" r="80" fill="url(#glow)"/>
+  <circle cx="512" cy="512" r="36" fill="#f0f6fc"/>
+
+  <!-- Satellites -->
+  <circle cx="512" cy="192" r="40" fill="url(#glow)"/>
+  <circle cx="789" cy="672" r="36" fill="url(#accent)"/>
+  <circle cx="235" cy="672" r="36" fill="url(#accent)"/>
+
+  <!-- Connectors -->
+  <line x1="512" y1="232" x2="512" y2="352" stroke="url(#glow)" stroke-width="12" stroke-linecap="round" stroke-dasharray="16 12"/>
+  <line x1="755" y1="648" x2="650" y2="592" stroke="url(#accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="16 12"/>
+  <line x1="269" y1="648" x2="374" y2="592" stroke="url(#accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="16 12"/>
+</svg>
